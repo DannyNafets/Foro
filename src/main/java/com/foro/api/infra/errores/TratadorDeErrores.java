@@ -19,7 +19,8 @@ public class TratadorDeErrores {
     // Esta excepcion aparece cuando se busca un usuario que no existe o un topico en este caso
     @ExceptionHandler(EntityNotFoundException.class)
     public ResponseEntity tratarError404(){
-        return ResponseEntity.notFound().build();
+        //return ResponseEntity.notFound().build();
+        return ResponseEntity.badRequest().body("Este topico no existe");
     }
 
     // Esta excepcion aparece cuando no se estan ingresando los datos completos
@@ -50,7 +51,9 @@ public class TratadorDeErrores {
     @ExceptionHandler(SQLIntegrityConstraintViolationException.class)
     @ResponseStatus(HttpStatus.BAD_REQUEST)
     public ResponseEntity handleSQLIntegrityConstraintViolationException(SQLIntegrityConstraintViolationException ex) {
-        String errorMessage = "Este titulo o este mensaje ya existen dentro del Foro: " + ex.getMessage();
+        String errorMessage = "Este titulo o este mensaje ya existen dentro del Foro, o no deben ser nulos: " + ex.getMessage();
         return new ResponseEntity<>(errorMessage, HttpStatus.BAD_REQUEST);
     }
+
+
 }

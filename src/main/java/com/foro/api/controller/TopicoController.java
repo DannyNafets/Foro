@@ -40,4 +40,33 @@ public class TopicoController {
     public ResponseEntity<Page<DatosListadoTopico>> listadoTopico(@PageableDefault(size = 10) Pageable paginacion){
         return ResponseEntity.ok(topicoRepository.findAll(paginacion).map(DatosListadoTopico::new));
     }
+
+    @GetMapping("/{id}")
+    public ResponseEntity<DatosRespuestaTopico> retornaDatosTopico(@PathVariable Long id){
+        Topico topico = topicoRepository.getReferenceById(id);
+        var datosTopico = new DatosRespuestaTopico(topico.getId(), topico.getTitulo(),
+                topico.getMensaje(), topico.getFechaCreacion().toString(),
+                new DatosUsuario(topico.getAutor().getNombreUsuario(), topico.getAutor().getEmail(), topico.getAutor().getClave()),
+                new DatosCurso(topico.getCurso().getNombreCurso(), topico.getCurso().getCategoria()));
+
+        return ResponseEntity.ok(datosTopico);
+    }
+
+    @PutMapping("/{id}")
+    @Transactional
+    public ResponseEntity<DatosRespuestaTopico> actualizarTopico(@PathVariable Long id, @RequestBody DatosActualizarTopico datosActualizarTopico){
+        Topico topico = topicoRepository.getReferenceById(id);
+        topico.actulizarDatos(datosActualizarTopico);
+        return ResponseEntity.ok().body(new DatosRespuestaTopico(topico.getId(), topico.getTitulo(),
+                topico.getMensaje(), topico.getFechaCreacion().toString(),
+                new DatosUsuario(topico.getAutor().getNombreUsuario(), topico.getAutor().getEmail(), topico.getAutor().getClave()),
+                new DatosCurso(topico.getCurso().getNombreCurso(), topico.getCurso().getCategoria())));
+    }
+
+    @DeleteMapping("/{id}")
+    @Transactional
+    public void removerTopico(@PathVariable Long id){
+        Topico topico = topicoRepository.getReferenceById(id);
+        topicoRepository.delete(topico);
+    }
 }

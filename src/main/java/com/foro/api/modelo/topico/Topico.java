@@ -38,6 +38,7 @@ public class Topico {
 
 	@Embedded
 	private Curso curso;
+
 	//private List<Respuesta> respuestas = new ArrayList<>();
 
 	public Topico(DatosRegistrarTopico datosRegistrarTopico) {
@@ -50,4 +51,12 @@ public class Topico {
 	}
 
 
+	public void actulizarDatos(DatosActualizarTopico datosActualizarTopico) {
+		if (datosActualizarTopico.titulo() != ""){
+			this.titulo = datosActualizarTopico.titulo();
+		}
+		if (datosActualizarTopico.mensaje() != ""){
+			this.mensaje = datosActualizarTopico.mensaje();
+		}
+	}
 }
