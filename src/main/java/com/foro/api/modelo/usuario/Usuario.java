@@ -1,30 +1,77 @@
 package com.foro.api.modelo.usuario;
 
-import jakarta.persistence.Embeddable;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
+import java.util.Collection;
+import java.util.List;
+
+import jakarta.persistence.*;
+import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
+import org.springframework.security.core.userdetails.UserDetails;
+
 import lombok.*;
 
-@Embeddable
+@Entity(name = "Usuario")
+@Table(name = "usuarios")
 @Getter
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-//@EqualsAndHashCode(of = "id")
-public class Usuario {
+@EqualsAndHashCode(of = "id")
+public class Usuario implements UserDetails {
 
-	//@Id
-	//@GeneratedValue(strategy = GenerationType.IDENTITY)
-	//private Long id;
-	private String nombreUsuario;
+	@Id
+	@GeneratedValue(strategy = GenerationType.IDENTITY)
+	private Long id;
+
+	private String login;
 	private String email;
 	private String clave;
 
-	public Usuario(DatosUsuario datosUsuario){
-		this.nombreUsuario = datosUsuario.nombreUsuario();
+	public Usuario(DatosUsuario datosUsuario) {
+		this.login = datosUsuario.login();
 		this.email = datosUsuario.email();
 		this.clave = datosUsuario.clave();
+	}
+
+	public Usuario(String nombreUsuario, String email, String clave) {
+		this.login = nombreUsuario;
+		this.email = email;
+		this.clave = clave;
+	}
+
+	@Override
+	public Collection<? extends GrantedAuthority> getAuthorities() {
+		return List.of(new SimpleGrantedAuthority("ROLE_USER"));
+	}
+
+	@Override
+	public String getPassword() {
+		return clave;
+	}
+
+	@Override
+	public String getUsername() {
+		return login;
+	}
+
+	@Override
+	public boolean isAccountNonExpired() {
+		return true;
+	}
+
+	@Override
+	public boolean isAccountNonLocked() {
+		return true;
+	}
+
+	@Override
+	public boolean isCredentialsNonExpired() {
+		return true;
+	}
+
+	@Override
+	public boolean isEnabled() {
+		return true;
 	}
 
 }

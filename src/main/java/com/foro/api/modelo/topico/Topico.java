@@ -1,14 +1,14 @@
 package com.foro.api.modelo.topico;
 
-import com.foro.api.modelo.respuesta.Respuesta;
+// import com.foro.api.modelo.respuesta.Respuesta;
 import com.foro.api.modelo.curso.Curso;
 import com.foro.api.modelo.usuario.Usuario;
 import jakarta.persistence.*;
 import lombok.*;
 
 import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.List;
+// import java.util.ArrayList;
+// import java.util.List;
 
 @Entity(name = "Topico")
 @Table(name = "topicos")
@@ -33,29 +33,41 @@ public class Topico {
 	@Enumerated(EnumType.STRING)
 	private StatusTopico statusTopico;
 
-	@Embedded
-	private Usuario autor;
+	@ManyToOne(fetch = FetchType.LAZY)
+	@JoinColumn(name = "usuario_id")
+	private Usuario usuario;
 
-	@Embedded
+	@ManyToOne(fetch = FetchType.LAZY)
+	@JoinColumn(name = "curso_id")
 	private Curso curso;
 
-	//private List<Respuesta> respuestas = new ArrayList<>();
+	// private List<Respuesta> respuestas = new ArrayList<>();
 
 	public Topico(DatosRegistrarTopico datosRegistrarTopico) {
 		this.titulo = datosRegistrarTopico.titulo();
 		this.mensaje = datosRegistrarTopico.mensaje();
 		this.fechaCreacion = LocalDateTime.now();
 		this.statusTopico = StatusTopico.NO_RESPONDIDO;
-		this.autor = new Usuario(datosRegistrarTopico.usuario());
-		this.curso = new Curso(datosRegistrarTopico.curso());
+		this.usuario = usuario;
+		this.curso = curso;
 	}
 
+	public Topico(String titulo, String mensaje, LocalDateTime localDateTime, StatusTopico statusTopico,
+				  Usuario usuario, com.foro.api.modelo.curso.Curso curso) {
+		this.titulo = titulo;
+		this.mensaje = mensaje;
+		this.fechaCreacion = LocalDateTime.now();
+		this.statusTopico = StatusTopico.NO_RESPONDIDO;
+		this.usuario = usuario;
+		this.curso = curso;
+	}
 
 	public void actulizarDatos(DatosActualizarTopico datosActualizarTopico) {
-		if (datosActualizarTopico.titulo() != ""){
+		if (!"".equals(datosActualizarTopico.titulo())) { // esta liena de codigo es = if
+															// (datosActualizarTopico.titulo() != "")
 			this.titulo = datosActualizarTopico.titulo();
 		}
-		if (datosActualizarTopico.mensaje() != ""){
+		if (!"".equals(datosActualizarTopico.mensaje())) {
 			this.mensaje = datosActualizarTopico.mensaje();
 		}
 	}

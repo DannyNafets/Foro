@@ -16,9 +16,7 @@ public record DatosRegistrarTopico(
         LocalDateTime fechaCreacion,
         StatusTopico estatusTopico,
         @NotNull
-        @Valid
-        DatosUsuario usuario,
+        Long usuarioId,
         @NotNull
-        @Valid
-        DatosCurso curso) {
+        Long cursoId) {
 }

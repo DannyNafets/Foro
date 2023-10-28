@@ -3,17 +3,19 @@ package com.foro.api.modelo.curso;
 import jakarta.persistence.*;
 import lombok.*;
 
-@Embeddable
+
+@Entity(name = "Curso")
+@Table(name = "cursos")
 @Getter
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-//@EqualsAndHashCode(of = "id")
+@EqualsAndHashCode(of = "id")
 public class Curso {
 
-//	@Id
-//	@GeneratedValue(strategy = GenerationType.IDENTITY)
-//	private Long id;
+	@Id
+	@GeneratedValue(strategy = GenerationType.IDENTITY)
+	private Long id;
 	private String nombreCurso;
 	private String categoria;
 

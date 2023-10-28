@@ -3,6 +3,7 @@ package com.foro.api.controller;
 import com.foro.api.modelo.curso.DatosCurso;
 import com.foro.api.modelo.topico.*;
 import com.foro.api.modelo.usuario.DatosUsuario;
+import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import jakarta.transaction.Transactional;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -14,59 +15,65 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.util.UriComponentsBuilder;
 
 import java.net.URI;
-import java.util.List;
 
 @RestController
 @RequestMapping("/topicos")
+@SecurityRequirement(name = "bearer-key")
 public class TopicoController {
 
-    @Autowired
-    private TopicoRepository topicoRepository;
-    @PostMapping
-    @Transactional
-    public ResponseEntity<DatosRespuestaTopico> registrarTopicos(@RequestBody @Valid DatosRegistrarTopico datosRegistrarTopico,
-                                           UriComponentsBuilder uriComponentsBuilder){
-        Topico topico = topicoRepository.save(new Topico(datosRegistrarTopico));
-        DatosRespuestaTopico datosRespuestatopico = new DatosRespuestaTopico(topico.getId(), topico.getTitulo(),
-                topico.getMensaje(), topico.getFechaCreacion().toString(),
-                new DatosUsuario(topico.getAutor().getNombreUsuario(), topico.getAutor().getEmail(), topico.getAutor().getClave()),
-                new DatosCurso(topico.getCurso().getNombreCurso(), topico.getCurso().getCategoria()));
+        @Autowired
+        private TopicoRepository topicoRepository;
+        @Autowired
+        private RegistrarTopicoService registrarTopicoService;
 
-        URI url = uriComponentsBuilder.path("/topicos/{id}").buildAndExpand(topico.getId()).toUri();
-        return ResponseEntity.created(url).body(datosRespuestatopico);
-    }
+        @PostMapping
+        @Transactional
+        public ResponseEntity<DatosRespuestaTopico> registrarTopicos(
+                        @RequestBody @Valid DatosRegistrarTopico datosRegistrarTopico,
+                        UriComponentsBuilder uriComponentsBuilder) {
+                var response = registrarTopicoService.registarTopico(datosRegistrarTopico);
+//                Topico topico = topicoRepository.save(new Topico(datosRegistrarTopico));
+//                DatosRespuestaTopico datosRespuestatopico = new DatosRespuestaTopico(topico.getId(), topico.getTitulo(),
+//                                topico.getMensaje(), topico.getFechaCreacion().toString(),
+//                        topico.getStatusTopico().toString(),
+//                        topico.getUsuario().getId(), topico.getCurso().getId());
 
-    @GetMapping
-    public ResponseEntity<Page<DatosListadoTopico>> listadoTopico(@PageableDefault(size = 10) Pageable paginacion){
-        return ResponseEntity.ok(topicoRepository.findAll(paginacion).map(DatosListadoTopico::new));
-    }
+                URI url = uriComponentsBuilder.path("/topicos/{id}").buildAndExpand(response.id()).toUri();
+                return ResponseEntity.created(url).body(response);
+        }
 
-    @GetMapping("/{id}")
-    public ResponseEntity<DatosRespuestaTopico> retornaDatosTopico(@PathVariable Long id){
-        Topico topico = topicoRepository.getReferenceById(id);
-        var datosTopico = new DatosRespuestaTopico(topico.getId(), topico.getTitulo(),
-                topico.getMensaje(), topico.getFechaCreacion().toString(),
-                new DatosUsuario(topico.getAutor().getNombreUsuario(), topico.getAutor().getEmail(), topico.getAutor().getClave()),
-                new DatosCurso(topico.getCurso().getNombreCurso(), topico.getCurso().getCategoria()));
+        @GetMapping
+        public ResponseEntity<Page<DatosListadoTopico>> listadoTopico(@PageableDefault(size = 10) Pageable paginacion) {
+                return ResponseEntity.ok(topicoRepository.findAll(paginacion).map(DatosListadoTopico::new));
+        }
 
-        return ResponseEntity.ok(datosTopico);
-    }
+        @GetMapping("/{id}")
+        public ResponseEntity<DatosRespuestaTopico> retornaDatosTopico(@PathVariable Long id) {
+                Topico topico = topicoRepository.getReferenceById(id);
+                var datosTopico = new DatosRespuestaTopico(topico.getId(), topico.getTitulo(),
+                                topico.getMensaje(), topico.getFechaCreacion().toString(),
+                        topico.getStatusTopico().toString(), topico.getUsuario().getId(),
+                        topico.getCurso().getId());
 
-    @PutMapping("/{id}")
-    @Transactional
-    public ResponseEntity<DatosRespuestaTopico> actualizarTopico(@PathVariable Long id, @RequestBody DatosActualizarTopico datosActualizarTopico){
-        Topico topico = topicoRepository.getReferenceById(id);
-        topico.actulizarDatos(datosActualizarTopico);
-        return ResponseEntity.ok().body(new DatosRespuestaTopico(topico.getId(), topico.getTitulo(),
-                topico.getMensaje(), topico.getFechaCreacion().toString(),
-                new DatosUsuario(topico.getAutor().getNombreUsuario(), topico.getAutor().getEmail(), topico.getAutor().getClave()),
-                new DatosCurso(topico.getCurso().getNombreCurso(), topico.getCurso().getCategoria())));
-    }
+                return ResponseEntity.ok(datosTopico);
+        }
 
-    @DeleteMapping("/{id}")
-    @Transactional
-    public void removerTopico(@PathVariable Long id){
-        Topico topico = topicoRepository.getReferenceById(id);
-        topicoRepository.delete(topico);
-    }
+        @PutMapping("/{id}")
+        @Transactional
+        public ResponseEntity<DatosRespuestaTopico> actualizarTopico(@PathVariable Long id,
+                        @RequestBody DatosActualizarTopico datosActualizarTopico) {
+                Topico topico = topicoRepository.getReferenceById(id);
+                topico.actulizarDatos(datosActualizarTopico);
+                return ResponseEntity.ok().body(new DatosRespuestaTopico(topico.getId(), topico.getTitulo(),
+                                topico.getMensaje(), topico.getFechaCreacion().toString(),
+                        topico.getStatusTopico().toString(), topico.getUsuario().getId(),
+                        topico.getCurso().getId()));
+        }
+
+        @DeleteMapping("/{id}")
+        @Transactional
+        public void removerTopico(@PathVariable Long id) {
+                Topico topico = topicoRepository.getReferenceById(id);
+                topicoRepository.delete(topico);
+        }
 }

@@ -5,11 +5,8 @@ create table topicos(
     mensaje varchar(100) not null unique,
     fecha_creacion datetime not null,
     status_topico varchar(100) not null,
-    nombre_usuario varchar(100) not null,
-    email varchar(100) not null,
-    clave varchar(100) not null,
-    nombre_curso varchar(100) not null,
-    categoria varchar(100) not null,
+    usuario_id int not null,
+    curso_id int not null,
 
     primary key (id)
 );
